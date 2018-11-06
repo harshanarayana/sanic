@@ -49,7 +49,10 @@ def test_logging_defaults():
     reset_logging()
     app = Sanic("test_logging")
 
-    for fmt in [h.formatter for h in logging.getLogger('root').handlers]:
+    # Assert default log level for sanic root.
+    assert logging.getLogger('sanic.root').getEffectiveLevel() == logging.INFO
+
+    for fmt in [h.formatter for h in logging.getLogger('sanic.root').handlers]:
         assert fmt._fmt == LOGGING_CONFIG_DEFAULTS['formatters']['generic']['format']
 
     for fmt in [h.formatter for h in logging.getLogger('sanic.error').handlers]:
@@ -68,7 +71,7 @@ def test_logging_pass_customer_logconfig():
 
     app = Sanic("test_logging", log_config=modified_config)
 
-    for fmt in [h.formatter for h in logging.getLogger('root').handlers]:
+    for fmt in [h.formatter for h in logging.getLogger('sanic.root').handlers]:
         assert fmt._fmt == modified_config['formatters']['generic']['format']
 
     for fmt in [h.formatter for h in logging.getLogger('sanic.error').handlers]:
@@ -78,11 +81,22 @@ def test_logging_pass_customer_logconfig():
         assert fmt._fmt == modified_config['formatters']['access']['format']
 
 
+def test_logging_modified_root_logger_config():
+    reset_logging()
+
+    modified_config = LOGGING_CONFIG_DEFAULTS
+    modified_config['loggers']['sanic.root']['level'] = "DEBUG"
+
+    app = Sanic("test_logging", log_config=modified_config)
+
+    assert logging.getLogger('sanic.root').getEffectiveLevel() == logging.DEBUG
+
+
 @pytest.mark.parametrize('debug', (True, False, ))
 def test_log_connection_lost(app, debug, monkeypatch):
     """ Should not log Connection lost exception on non debug """
     stream = StringIO()
-    root = logging.getLogger('root')
+    root = logging.getLogger('sanic.root')
     root.addHandler(logging.StreamHandler(stream))
     monkeypatch.setattr(sanic.server, 'logger', root)
 
