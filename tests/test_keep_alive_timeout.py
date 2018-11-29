@@ -28,8 +28,8 @@ class ReuseableTCPConnector(TCPConnector):
 
 
 class ReuseableSanicTestClient(SanicTestClient):
-    def __init__(self, app, loop=None):
-        super(ReuseableSanicTestClient, self).__init__(app)
+    def __init__(self, app, loop=None, port=None):
+        super(ReuseableSanicTestClient, self).__init__(app, port=port)
         if loop is None:
             loop = asyncio.get_event_loop()
         self._loop = loop
@@ -73,7 +73,7 @@ class ReuseableSanicTestClient(SanicTestClient):
             _server = self._server
         else:
             _server_co = self.app.create_server(host=HOST, debug=debug,
-                                                port=PORT, **server_kwargs)
+                                                port=self.port, **server_kwargs)
 
             server.trigger_events(
                 self.app.listeners['before_server_start'], loop)
@@ -194,13 +194,13 @@ async def handler3(request):
     return text('OK')
 
 
-def test_keep_alive_timeout_reuse():
+def test_keep_alive_timeout_reuse(free_port):
     """If the server keep-alive timeout and client keep-alive timeout are
      both longer than the delay, the client _and_ server will successfully
      reuse the existing connection."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    client = ReuseableSanicTestClient(keep_alive_timeout_app_reuse, loop)
+    client = ReuseableSanicTestClient(keep_alive_timeout_app_reuse, loop, port=free_port)
     headers = {
         'Connection': 'keep-alive'
     }
@@ -213,13 +213,13 @@ def test_keep_alive_timeout_reuse():
     assert response.text == 'OK'
 
 
-def test_keep_alive_client_timeout():
+def test_keep_alive_client_timeout(free_port):
     """If the server keep-alive timeout is longer than the client
     keep-alive timeout, client will try to create a new connection here."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     client = ReuseableSanicTestClient(keep_alive_app_client_timeout,
-                                      loop)
+                                      loop, port=free_port)
     headers = {
         'Connection': 'keep-alive'
     }
@@ -239,7 +239,7 @@ def test_keep_alive_client_timeout():
     assert "got a new connection" in exception.args[0]
 
 
-def test_keep_alive_server_timeout():
+def test_keep_alive_server_timeout(free_port):
     """If the client keep-alive timeout is longer than the server
     keep-alive timeout, the client will either a 'Connection reset' error
     _or_ a new connection. Depending on how the event-loop handles the
@@ -247,7 +247,7 @@ def test_keep_alive_server_timeout():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     client = ReuseableSanicTestClient(keep_alive_app_server_timeout,
-                                      loop)
+                                      loop, port=free_port)
     headers = {
         'Connection': 'keep-alive'
     }

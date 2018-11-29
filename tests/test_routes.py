@@ -5,6 +5,7 @@ from sanic import Sanic
 from sanic.response import text, json
 from sanic.router import RouteExists, RouteDoesNotExist, ParameterNameConflicts
 from sanic.constants import HTTP_METHODS
+from sanic.testing import SanicTestClient
 
 
 # ------------------------------------------------------------ #
@@ -98,8 +99,9 @@ def test_route_invalid_parameter_syntax(app):
         request, response = app.test_client.get('/get')
 
 
-def test_route_strict_slash_default_value():
+def test_route_strict_slash_default_value(free_port):
     app = Sanic('test_route_strict_slash', strict_slashes=True)
+    app.test_client = SanicTestClient(app=app, port=free_port)
 
     @app.get('/get')
     def handler(request):
@@ -119,8 +121,9 @@ def test_route_strict_slash_without_passing_default_value(app):
     assert response.text == 'OK'
 
 
-def test_route_strict_slash_default_value_can_be_overwritten():
+def test_route_strict_slash_default_value_can_be_overwritten(free_port):
     app = Sanic('test_route_strict_slash', strict_slashes=True)
+    app.test_client = SanicTestClient(app=app, port=free_port)
 
     @app.get('/get', strict_slashes=False)
     def handler(request):

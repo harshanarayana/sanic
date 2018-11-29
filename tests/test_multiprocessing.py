@@ -13,7 +13,7 @@ from sanic.response import text
     reason='SIGALRM is not implemented for this platform, we have to come '
     'up with another timeout strategy to test these'
 )
-def test_multiprocessing(app):
+def test_multiprocessing(app, free_port):
     """Tests that the number of children we produce is correct"""
     # Selects a number at random so we can spot check
     num_workers = random.choice(range(2, multiprocessing.cpu_count() * 2 + 1))
@@ -26,7 +26,7 @@ def test_multiprocessing(app):
 
     signal.signal(signal.SIGALRM, stop_on_alarm)
     signal.alarm(3)
-    app.run(HOST, PORT, workers=num_workers)
+    app.run(HOST, free_port, workers=num_workers)
 
     assert len(process_list) == num_workers
 
@@ -35,7 +35,7 @@ def test_multiprocessing(app):
     not hasattr(signal, 'SIGALRM'),
     reason='SIGALRM is not implemented for this platform',
 )
-def test_multiprocessing_with_blueprint(app):
+def test_multiprocessing_with_blueprint(app, free_port):
     from sanic import Blueprint
     # Selects a number at random so we can spot check
     num_workers = random.choice(range(2, multiprocessing.cpu_count() * 2 + 1))
@@ -51,7 +51,7 @@ def test_multiprocessing_with_blueprint(app):
 
     bp = Blueprint('test_text')
     app.blueprint(bp)
-    app.run(HOST, PORT, workers=num_workers)
+    app.run(HOST, free_port, workers=num_workers)
 
     assert len(process_list) == num_workers
 

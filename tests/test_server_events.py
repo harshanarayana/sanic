@@ -33,20 +33,20 @@ def start_stop_app(random_name_app, **run_kwargs):
     signal.signal(signal.SIGALRM, stop_on_alarm)
     signal.alarm(1)
     try:
-        random_name_app.run(HOST, PORT, **run_kwargs)
+        random_name_app.run(HOST, **run_kwargs)
     except KeyboardInterrupt:
         pass
 
 
 @skipif_no_alarm
 @pytest.mark.parametrize('listener_name', AVAILABLE_LISTENERS)
-def test_single_listener(app, listener_name):
+def test_single_listener(app, listener_name, free_port):
     """Test that listeners on their own work"""
     output = []
     # Register listener
     app.listener(listener_name)(
         create_listener(listener_name, output))
-    start_stop_app(app)
+    start_stop_app(app, port=free_port)
     assert app.name + listener_name == output.pop()
 
 

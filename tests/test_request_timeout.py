@@ -134,8 +134,8 @@ class DelayableTCPConnector(TCPConnector):
 
 
 class DelayableSanicTestClient(SanicTestClient):
-    def __init__(self, app, loop, request_delay=1):
-        super(DelayableSanicTestClient, self).__init__(app)
+    def __init__(self, app, loop, request_delay=1, port=None):
+        super(DelayableSanicTestClient, self).__init__(app, port=port)
         self._request_delay = request_delay
         self._loop = None
 
@@ -188,15 +188,15 @@ async def handler2(request):
     return text('OK')
 
 
-def test_default_server_error_request_timeout():
-    client = DelayableSanicTestClient(request_timeout_default_app, None, 2)
+def test_default_server_error_request_timeout(free_port):
+    client = DelayableSanicTestClient(request_timeout_default_app, None, 2, port=free_port)
     request, response = client.get('/1')
     assert response.status == 408
     assert response.text == 'Error: Request Timeout'
 
 
-def test_default_server_error_request_dont_timeout():
-    client = DelayableSanicTestClient(request_no_timeout_app, None, 0.2)
+def test_default_server_error_request_dont_timeout(free_port):
+    client = DelayableSanicTestClient(request_no_timeout_app, None, 0.2, port=free_port)
     request, response = client.get('/1')
     assert response.status == 200
     assert response.text == 'OK'

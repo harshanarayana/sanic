@@ -230,7 +230,7 @@ def test_stream_response_includes_chunked_header():
     assert b"Transfer-Encoding: chunked\r\n" in headers
 
 
-def test_stream_response_writes_correct_content_to_transport(streaming_app):
+def test_stream_response_writes_correct_content_to_transport(streaming_app, free_port):
     response = StreamingHTTPResponse(sample_streaming_fn)
     response.protocol = MagicMock(HttpProtocol)
     response.protocol.transport = MagicMock(asyncio.Transport)
@@ -261,7 +261,7 @@ def test_stream_response_writes_correct_content_to_transport(streaming_app):
 
         app.stop()
 
-    streaming_app.run(host=HOST, port=PORT)
+    streaming_app.run(host=HOST, port=free_port)
 
 
 @pytest.fixture

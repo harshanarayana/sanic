@@ -5,15 +5,16 @@ from sanic import Sanic
 from sanic.response import text
 from sanic.exceptions import InvalidUsage, ServerError, NotFound, Unauthorized
 from sanic.exceptions import Forbidden, abort
-
+from sanic.testing import SanicTestClient
 
 class SanicExceptionTestException(Exception):
     pass
 
 
 @pytest.fixture(scope='module')
-def exception_app():
+def exception_app(free_port):
     app = Sanic('test_exceptions')
+    app.test_client = SanicTestClient(app=app, port=free_port)
 
     @app.route('/')
     def handler(request):

@@ -316,7 +316,7 @@ def test_post_form_multipart_form_data(app, payload):
         ('/bar/baz', '', 'http://{}:{}/bar/baz'),
         ('/moo/boo', 'arg1=val1', 'http://{}:{}/moo/boo?arg1=val1')
     ])
-def test_url_attributes_no_ssl(app, path, query, expected_url):
+def test_url_attributes_no_ssl(app, path, query, expected_url, free_port):
 
     async def handler(request):
         return text('OK')
@@ -340,7 +340,7 @@ def test_url_attributes_no_ssl(app, path, query, expected_url):
         ('/bar/baz', '', 'https://{}:{}/bar/baz'),
         ('/moo/boo', 'arg1=val1', 'https://{}:{}/moo/boo?arg1=val1')
     ])
-def test_url_attributes_with_ssl(app, path, query, expected_url):
+def test_url_attributes_with_ssl(app, path, query, expected_url, free_port):
     current_dir = os.path.dirname(os.path.realpath(__file__))
     context = ssl.create_default_context(purpose=ssl.Purpose.CLIENT_AUTH)
     context.load_cert_chain(

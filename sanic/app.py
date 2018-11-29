@@ -70,6 +70,7 @@ class Sanic:
 
         # Register alternative method names
         self.go_fast = self.run
+        self._test_client = None
 
     @property
     def loop(self):
@@ -814,7 +815,14 @@ class Sanic:
 
     @property
     def test_client(self):
-        return SanicTestClient(self)
+        if self._test_client:
+            return self._test_client
+        else:
+            return SanicTestClient(self)
+
+    @test_client.setter
+    def test_client(self, test_client):
+        self._test_client = test_client
 
     # -------------------------------------------------------------------- #
     # Execution

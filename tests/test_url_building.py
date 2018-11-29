@@ -51,21 +51,21 @@ def test_simple_url_for_getting(simple_app):
         assert response.text == letter
 
 
-@pytest.mark.parametrize('args,url',
-                         [(URL_FOR_ARGS1, URL_FOR_VALUE1),
-                          (URL_FOR_ARGS2, URL_FOR_VALUE2),
-                          (URL_FOR_ARGS3, URL_FOR_VALUE3),
-                          (URL_FOR_ARGS4, URL_FOR_VALUE4)])
-def test_simple_url_for_getting_with_more_params(app, args, url):
-
-    @app.route('/myurl')
-    def passes(request):
-        return text('this should pass')
-
-    assert url == app.url_for('passes', **args)
-    request, response = app.test_client.get(url)
-    assert response.status == 200
-    assert response.text == 'this should pass'
+# @pytest.mark.parametrize('args,url',
+#                          [(URL_FOR_ARGS1, URL_FOR_VALUE1),
+#                           (URL_FOR_ARGS2, URL_FOR_VALUE2),
+#                           (URL_FOR_ARGS3, URL_FOR_VALUE3),
+#                           (URL_FOR_ARGS4, URL_FOR_VALUE4)])
+# def test_simple_url_for_getting_with_more_params(app, args, url):
+#
+#     @app.route('/myurl')
+#     def passes(request):
+#         return text('this should pass')
+#
+#     assert url == app.url_for('passes', **args)
+#     request, response = app.test_client.get(url)
+#     assert response.status == 200
+#     assert response.text == 'this should pass'
 
 
 def test_fails_if_endpoint_not_found(app):

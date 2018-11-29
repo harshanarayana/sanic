@@ -20,7 +20,7 @@ def after(app, loop):
     calledq.put(loop.add_signal_handler.called)
 
 
-def test_register_system_signals(app):
+def test_register_system_signals(app, free_port):
     """Test if sanic register system signals"""
 
     @app.route('/hello')
@@ -31,11 +31,11 @@ def test_register_system_signals(app):
     app.listener('before_server_start')(set_loop)
     app.listener('after_server_stop')(after)
 
-    app.run(HOST, PORT)
+    app.run(HOST, free_port)
     assert calledq.get() is True
 
 
-def test_dont_register_system_signals(app):
+def test_dont_register_system_signals(app, free_port):
     """Test if sanic don't register system signals"""
 
     @app.route('/hello')
@@ -46,5 +46,5 @@ def test_dont_register_system_signals(app):
     app.listener('before_server_start')(set_loop)
     app.listener('after_server_stop')(after)
 
-    app.run(HOST, PORT, register_sys_signals=False)
+    app.run(HOST, free_port, register_sys_signals=False)
     assert calledq.get() is False

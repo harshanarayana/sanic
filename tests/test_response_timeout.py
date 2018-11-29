@@ -3,6 +3,7 @@ import asyncio
 from sanic.response import text
 from sanic.exceptions import ServiceUnavailable
 from sanic.config import Config
+from sanic.testing import SanicTestClient
 
 Config.RESPONSE_TIMEOUT = 1
 response_timeout_app = Sanic('test_response_timeout')
@@ -21,7 +22,8 @@ def handler_exception(request, exception):
     return text('Response Timeout from error_handler.', 503)
 
 
-def test_server_error_response_timeout():
+def test_server_error_response_timeout(free_port):
+    response_timeout_app.test_client = SanicTestClient(app=response_timeout_app, port=free_port)
     request, response = response_timeout_app.test_client.get('/1')
     assert response.status == 503
     assert response.text == 'Response Timeout from error_handler.'
@@ -33,7 +35,8 @@ async def handler_2(request):
     return text('OK')
 
 
-def test_default_server_error_response_timeout():
+def test_default_server_error_response_timeout(free_port):
+    response_timeout_default_app.test_client = SanicTestClient(app=response_timeout_default_app, port=free_port)
     request, response = response_timeout_default_app.test_client.get('/1')
     assert response.status == 503
     assert response.text == 'Error: Response Timeout'
@@ -58,7 +61,8 @@ async def handler_3(request):
     return text('OK')
 
 
-def test_response_handler_cancelled():
+def test_response_handler_cancelled(free_port):
+    response_handler_cancelled_app.test_client = SanicTestClient(app=response_handler_cancelled_app, port=free_port)
     request, response = response_handler_cancelled_app.test_client.get('/1')
     assert response.status == 503
     assert response.text == 'Error: Response Timeout'

@@ -49,29 +49,39 @@ def handler_exception(request, exception):
     return text("OK")
 
 
-def test_invalid_usage_exception_handler():
+def test_invalid_usage_exception_handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get('/1')
     assert response.status == 400
 
 
-def test_server_error_exception_handler():
+def test_server_error_exception_handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get('/2')
     assert response.status == 200
     assert response.text == 'OK'
 
 
-def test_not_found_exception_handler():
+def test_not_found_exception_handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get('/3')
     assert response.status == 200
 
 
-def test_text_exception__handler():
+def test_text_exception__handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get('/random')
     assert response.status == 200
     assert response.text == 'OK'
 
 
-def test_html_traceback_output_in_debug_mode():
+def test_html_traceback_output_in_debug_mode(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get(
         '/4', debug=True)
     assert response.status == 500
@@ -88,12 +98,16 @@ def test_html_traceback_output_in_debug_mode():
         "is not defined while handling path /4") == summary_text
 
 
-def test_inherited_exception_handler():
+def test_inherited_exception_handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get('/5')
     assert response.status == 200
 
 
-def test_chained_exception_handler():
+def test_chained_exception_handler(free_port):
+    from sanic.testing import SanicTestClient
+    exception_handler_app.test_client = SanicTestClient(app=exception_handler_app, port=free_port)
     request, response = exception_handler_app.test_client.get(
         '/6/0', debug=True)
     assert response.status == 500
